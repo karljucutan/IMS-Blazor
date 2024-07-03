@@ -19,14 +19,7 @@
             {
                 foreach (var inventory in inventories)
                 {
-                <tr>
-                    <td>@inventory.InventoryName</td>
-                    <td>@inventory.Quantity</td>
-                    <td>@inventory.Price.ToString("c")</td>
-                    <td>
-                        <button type="button" class="btn btn-light">Edit</button>
-                    </td>
-                </tr>
+                    <InventoryListItemComponent Inventory="inventory"></InventoryListItemComponent>
                 }
             }
         </tr>
