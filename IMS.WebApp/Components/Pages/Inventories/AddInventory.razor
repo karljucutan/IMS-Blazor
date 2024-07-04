@@ -6,12 +6,16 @@
 <br />
 
 <EditForm Model="Inventory" FormName="formInventory" OnValidSubmit="Save">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
     <div class="form-group">
         <label for="name">Inventory Name</label>
         <InputText id="name"
                    @bind-Value="Inventory.InventoryName"
                    class="form-control">
         </InputText>
+        <ValidationMessage For="() => Inventory.InventoryName"></ValidationMessage>
     </div>
 
     <div class="form-group">
@@ -20,6 +24,7 @@
                      @bind-Value="Inventory.Quantity"
                      class="form-control">
         </InputNumber>
+        <ValidationMessage For="() => Inventory.Quantity"></ValidationMessage>
     </div>
 
     <div class="form-group">
@@ -28,6 +33,7 @@
                      @bind-Value="Inventory.Price"
                      class="form-control">
         </InputNumber>
+        <ValidationMessage For="() => Inventory.Price"></ValidationMessage>
     </div>
 
     <button type="submit" class="btn btn-primary">Save</button>
