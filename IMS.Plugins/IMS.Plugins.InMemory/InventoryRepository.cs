@@ -7,7 +7,7 @@ namespace IMS.Plugins.InMemory
     {
         private List<Inventory> _inventories;
 
-        public InventoryRepository() 
+        public InventoryRepository()
         {
             _inventories = new()
             {
@@ -20,14 +20,22 @@ namespace IMS.Plugins.InMemory
 
         public Task AddInventoryAsync(Inventory inventory)
         {
-            throw new NotImplementedException();
+            if (_inventories.Any(inventories_inv => string.Equals(inventories_inv.InventoryName, inventory.InventoryName, StringComparison.OrdinalIgnoreCase)))
+                return Task.CompletedTask;
+
+            var maxId = _inventories.Max(inventory => inventory.InventoryId);
+            inventory.InventoryId = maxId + 1;
+
+            _inventories.Add(inventory);
+
+            return Task.CompletedTask;
         }
 
         public async Task<IEnumerable<Inventory>> GetInventoriesByNameAsync(string name)
         {
             if (string.IsNullOrWhiteSpace(name)) return await Task.FromResult(_inventories);
 
-            return _inventories.Where(inventory =>  inventory.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase));
+            return _inventories.Where(inventory => inventory.InventoryName.Contains(name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
