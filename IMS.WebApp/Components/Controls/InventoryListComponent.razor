@@ -29,7 +29,7 @@
     [Parameter]
     public string SearchInventoryFilter { get; set; } = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         inventories = (await ViewInventoriesByNameUseCase.ExecuteAsync(SearchInventoryFilter)).ToList();
     }
