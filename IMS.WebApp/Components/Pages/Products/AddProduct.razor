@@ -1,11 +1,15 @@
 ﻿@page "/addproduct"
 
+@rendermode InteractiveServer
+@* Rendermode is added here since this is already the page *@
+
 @inject IAddProductUseCase AddProductUseCase
 @inject NavigationManager NavigationManager
 
 <h3>Add Product</h3>
 <br />
 
+@* formname in editform is not needed in InteractiveServer rendermode *@
 <EditForm Model="Product" FormName="formProduct" OnValidSubmit="Save">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
@@ -42,7 +46,8 @@
 </EditForm>
 
 @code {
-    [SupplyParameterFromForm]
+    // SupplyParameterFromForm is not needed in InteractiveServer rendermode since there is no httpcall(POST) in signalR (websocket, a full duplex communication).
+    //[SupplyParameterFromForm]
     private Product Product { get; set; } = new();
 
     private async Task Save()
