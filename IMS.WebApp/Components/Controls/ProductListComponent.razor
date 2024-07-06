@@ -1,5 +1,6 @@
 ﻿@inject IViewProductsByNameUseCase ViewProductsByNameUseCase
 
+<i class="fs-6 fst-italic">Product List Item is rendered in InteractiveServer. It is used to enable interactive server-side rendering with real-time updates. This mode allows for more dynamic interactions by enabling server-side Blazor with interactive capabilities. The client loads a minimal HTML shell and establishes a SignalR connection to interact with the server. </i>
 <table class="table">
     <thead>
         <tr>
@@ -15,6 +16,9 @@
             @foreach (var product in products)
             {
                 <tr>
+                    @* This is the recommended on where to put rendermode so that the component's
+                        rendermode is configurable and not fixed to the component and due to this
+                        component's behavior to be reusable.*@
                     <ProductListItemComponent @rendermode="InteractiveServer" Product="product"></ProductListItemComponent>
                 </tr>
             }
