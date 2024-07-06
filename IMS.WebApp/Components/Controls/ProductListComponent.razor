@@ -10,15 +10,21 @@
         </tr>
     </thead>
     <tbody>
-        <tr>
-            @if (products is not null && products.Count > 0)
+        @if (products is not null && products.Count > 0)
+        {
+            @foreach (var product in products)
             {
-                foreach (var product in products)
-                {
+                <tr>
                     <ProductListItemComponent @rendermode="InteractiveServer" Product="product"></ProductListItemComponent>
-                }
+                </tr>
             }
-        </tr>
+        }
+        else
+        {
+            <tr>
+                <td colspan="4">No products found.</td>
+            </tr>
+        }
     </tbody>
 </table>
 
