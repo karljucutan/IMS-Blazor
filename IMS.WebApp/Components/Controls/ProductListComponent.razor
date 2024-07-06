@@ -15,7 +15,7 @@
             {
                 foreach (var product in products)
                 {
-                    <ProductListItemComponent Product="product"></ProductListItemComponent>
+                    <ProductListItemComponent @rendermode="InteractiveServer" Product="product"></ProductListItemComponent>
                 }
             }
         </tr>
