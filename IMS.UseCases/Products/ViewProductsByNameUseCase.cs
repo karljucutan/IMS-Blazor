@@ -4,7 +4,7 @@ using IMS.UseCases.Products.Interfaces;
 
 namespace IMS.UseCases.Products
 {
-    public class ViewProductsByNameUseCase : IViewProductByNameUseCase
+    public class ViewProductsByNameUseCase : IViewProductsByNameUseCase
     {
         private readonly IProductRepository _productRepository;
 
