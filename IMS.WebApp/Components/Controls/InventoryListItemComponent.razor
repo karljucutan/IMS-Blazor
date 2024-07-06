@@ -1,4 +1,5 @@
 ﻿@inject IDeleteInventoryByIdUseCase DeleteInventoryByIdUseCase 
+@inject NavigationManager NavigationManager
 
 @if (Inventory is not null)
 {
@@ -28,5 +29,6 @@
     private async Task DeleteInventory(int inventoryId)
     {
         await DeleteInventoryByIdUseCase.ExecuteAsync(inventoryId);
+        NavigationManager.NavigateTo("/inventories");
     }
 }
