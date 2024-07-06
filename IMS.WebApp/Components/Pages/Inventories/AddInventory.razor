@@ -4,6 +4,13 @@
 @inject NavigationManager NavigationManager
 
 <h3>Add Inventory</h3>
+<i class="fs-6 fst-italic">
+    The "Add inventory" page is currently <strong>rendered with static server-side rendering.</strong>
+    After submitting the form, the page navigates to the inventories page, which triggers a <strong>full page refresh.</strong>
+    By setting `Enhance="true"` on the &lt;EditForm&gt; component, you can enable partial page rendering,
+        allowing the inventories page to be updated dynamically without a full page reload.
+</i>
+
 <br />
 
 <EditForm Model="Inventory" FormName="formInventory" OnValidSubmit="Save">
