@@ -1,37 +1,41 @@
-﻿<SearchProductInventoriesComponent OnInventorySelected="HandleInventorySelected"></SearchProductInventoriesComponent>
+﻿<div class="card">
+    <div class="card-body">
+        <SearchProductInventoriesComponent OnInventorySelected="HandleInventorySelected"></SearchProductInventoriesComponent>
 
-@if (Product is not null &&
-    Product.ProductInventories is not null &&
-    Product.ProductInventories.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var productInventory in Product.ProductInventories)
-            {
-                <tr>
-                    <td>@productInventory.Inventory?.InventoryName</td>
-                    <td>
-                        <input type="number" min="0" @bind-value="productInventory.InventoryQuantity" />
-                    </td>
-                    <td>
-                        <button type="button"
-                                class="btn btn-link"
-                                @onclick="() => RemoveInventory(productInventory)">
-                            Remove
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+        @if (Product is not null &&
+        Product.ProductInventories is not null &&
+        Product.ProductInventories.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Quantity</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var productInventory in Product.ProductInventories)
+                    {
+                        <tr>
+                            <td>@productInventory.Inventory?.InventoryName</td>
+                            <td>
+                                <input type="number" min="0" @bind-value="productInventory.InventoryQuantity" />
+                            </td>
+                            <td>
+                                <button type="button"
+                                        class="btn btn-link"
+                                        @onclick="() => RemoveInventory(productInventory)">
+                                    Remove
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
 
 @code {
     [Parameter]
