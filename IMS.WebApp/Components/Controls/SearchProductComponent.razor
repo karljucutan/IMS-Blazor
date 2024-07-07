@@ -5,7 +5,8 @@
 <div class="input-group">
     <input class="form-control"
            placeholder="Type something here to search"
-           @bind="SearchFilter" />
+           @bind-value="SearchFilter"
+           @bind-value:event="oninput"/>
     <button type="button" class="btn-success input-group-text" @onclick="HandleSearch">Search</button>
 </div>
 
@@ -26,11 +27,35 @@
 }
 
 @code {
-    public string SearchFilter { get; set; } = string.Empty;
+    private string _searchFilter = string.Empty;
+
+    public string SearchFilter
+    {
+        get => _searchFilter;
+        set
+        {
+            if (_searchFilter != value)
+            {
+                _searchFilter = value;
+                HandleSearch();
+
+                //HandleSearchAsync() async call without await
+            }
+        }
+    }
+
     private List<Inventory> inventories = new();
 
-    private async Task HandleSearch()
+    private async void HandleSearch()
+    {
+        await HandleSearchAsync();
+    }
+
+    private async Task HandleSearchAsync()
     {
         inventories = (await ViewInventoriesByNameUseCase.ExecuteAsync(SearchFilter)).ToList();
+
+        // StateHasChanged can be used if we will call an asynchronus call in the UI to notify the component of state changed.
+        //StateHasChanged();
     }
 }
