@@ -12,13 +12,13 @@
 
 @if (inventories is not null && inventories.Any())
 {
-    <div style="overflow-y:auto; max-height:300px; border:1px solid silver; padding-top:5px">
-        <ul style="list-style-type:none">
+    <div class="search-result">
+        <ul>
             @foreach (var inventory in inventories)
             {
                 // The @key directive is used to optimize rendering performance by helping Blazor identify elements during updates,
                 // similar to how indexing works for databases.
-                <li @key="inventory.InventoryId" style="cursor: pointer">
+                <li @key="inventory.InventoryId">
                     @inventory.InventoryName
                 </li>
             }
