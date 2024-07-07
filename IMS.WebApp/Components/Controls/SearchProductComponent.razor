@@ -7,7 +7,7 @@
            placeholder="Type something here to search"
            @bind-value="SearchFilter"
            @bind-value:event="oninput"/>
-    <button type="button" class="btn-success input-group-text" @onclick="HandleSearch">Search</button>
+    <button type="button" class="btn-success input-group-text" @onclick="HandleSearchAsync">Search</button>
 </div>
 
 @if (inventories is not null && inventories.Any())
@@ -37,9 +37,10 @@
             if (_searchFilter != value)
             {
                 _searchFilter = value;
-                HandleSearch();
+                //HandleSearch();
 
-                //HandleSearchAsync() async call without await
+                HandleSearchAsync(); 
+                //async call without await
             }
         }
     }
@@ -56,6 +57,6 @@
         inventories = (await ViewInventoriesByNameUseCase.ExecuteAsync(SearchFilter)).ToList();
 
         // StateHasChanged can be used if we will call an asynchronus call in the UI to notify the component of state changed.
-        //StateHasChanged();
+        StateHasChanged();
     }
 }
