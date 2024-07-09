@@ -26,6 +26,12 @@
 }
 
 @code {
+    // NOTE
+    // EventCallback<T>
+    // Purpose: EventCallback<T> is used to notify the parent component of an event happening in the child component. It follows the typical event-driven pattern where the child component informs the parent of an event, and the parent can handle it accordingly.
+    // Usage: Primarily used for UI event handling such as button clicks, form submissions, etc.
+    // Asynchronous: EventCallback is designed to support asynchronous operations, which is common in event handling scenarios.
+    // Two-way Binding: Commonly used in scenarios where two-way data binding is required.
     [Parameter]
     public EventCallback<Inventory> OnInventorySelected { get; set; }
 
