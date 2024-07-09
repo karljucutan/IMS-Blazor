@@ -9,9 +9,14 @@
 <br />
 
 <AutoCompleteComponent Label="Purchase Inventory"
-                       SearchFunction="SearchInventory"></AutoCompleteComponent>
+                       SearchFunction="SearchInventory"
+                       OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
+<br />
+@selectedItem?.Name
 
 @code {
+    private ItemViewModel? selectedItem;
+
     private List<ItemViewModel>? SearchInventory(string name)
     {
         // this blocks the current thread
@@ -24,5 +29,10 @@
                     Id = inventory.InventoryId,
                     Name = inventory.InventoryName
                 }).ToList();
+    }
+
+    private void HandleItemSelected(ItemViewModel item)
+    {
+        selectedItem = item;
     }
 }

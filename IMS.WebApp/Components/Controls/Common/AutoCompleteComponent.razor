@@ -3,19 +3,23 @@
     <input
         type="text"
         class="form-control"
-        @bind-value="userInput"
-        @bind-value:event="oninput"/>
+        @bind-value="UserInput"
+        @bind-value:event="oninput" 
+        @onkeyup="OnKeyup"/>
 </div>
 
 @if (searchResults is not null && searchResults.Any())
 {
     <div class="search-result">
         <ul>
-            @foreach (var item in searchResults)
+            @for (int index = 0; index < searchResults.Count; index++)
             {
+                var item = searchResults[index];
                 // The @key directive is used to optimize rendering performance by helping Blazor identify elements during updates,
                 // similar to how indexing works for databases.
-                <li @key="item.Id">
+                <li @key="item.Id"
+                    class="@(item == currentItem ? "selected" : "")"
+                    @onclick="() => HandleSelectItem(item)">
                     @item.Name
                 </li>
             }
@@ -24,12 +28,20 @@
 }
 
 @code {
+    public class ItemViewModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
     private string _userInput = string.Empty;
     private List<ItemViewModel>? searchResults = null;
+    private ItemViewModel? selectedItem = null;
+    private ItemViewModel? currentItem = null;
+    private int currentItemIndex = -1;
 
     [Parameter]
     public string Label { get; set; } = string.Empty;
-
 
     // NOTE
     // Func<T, TResult>
@@ -39,7 +51,10 @@
     [Parameter]
     public Func<string, List<ItemViewModel>>? SearchFunction { get; set; }
 
-    public string userInput 
+    [Parameter]
+    public EventCallback<ItemViewModel> OnItemSelected { get; set; }
+
+    public string UserInput 
     { 
         get => _userInput;
         set 
@@ -51,9 +66,37 @@
         } 
     }
 
-    public class ItemViewModel
+    private void HandleSelectItem(ItemViewModel item)
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;    
+        if (item is not null)
+        {
+            selectedItem = item;
+            UserInput = item.Name ?? string.Empty;
+            OnItemSelected.InvokeAsync(item);
+        }
+        ClearHighlighting();
+    }
+
+    private void OnKeyup(KeyboardEventArgs keyboardEventArgs)
+    {
+        if (searchResults is not null &&
+            searchResults.Any())
+        {
+            if (keyboardEventArgs.Code == "ArrowDown" && currentItemIndex < searchResults.Count - 1)
+                currentItem = searchResults[++currentItemIndex];
+
+            else if (keyboardEventArgs.Code == "ArrowUp" && currentItemIndex > 0)
+                currentItem = searchResults[--currentItemIndex];
+
+            else if (keyboardEventArgs.Code == "Enter" || keyboardEventArgs.Code == "NumpadEnter")
+                HandleSelectItem(currentItem);
+        }
+    }
+
+    private void ClearHighlighting()
+    {
+        searchResults = null;
+        currentItem = null;
+        currentItemIndex = -1;
     }
 }
