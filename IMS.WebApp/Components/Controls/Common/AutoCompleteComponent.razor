@@ -48,22 +48,54 @@
     // Purpose: Func<T, TResult> is used to pass a function from the parent component to the child component.The child component can call this function to get some result based on the input.
     // Usage: Suitable for scenarios where the child component needs to delegate some processing to the parent component, like data fetching, complex calculations, etc.
     // Synchronous and Asynchronous: Func<T, TResult> is generally synchronous, but you can use Func<Task<TResult>> or similar for asynchronous operations.
+    
+    
+    // [Parameter]
+    // public Func<string, List<ItemViewModel>>? SearchFunction { get; set; }
+
+    // async implementation
     [Parameter]
-    public Func<string, List<ItemViewModel>>? SearchFunction { get; set; }
+    public Func<string, Task<List<ItemViewModel>>>? SearchFunction { get; set; }
 
     [Parameter]
     public EventCallback<ItemViewModel> OnItemSelected { get; set; }
 
-    public string UserInput 
-    { 
+    // public string UserInput 
+    // { 
+    //     get => _userInput;
+    //     set 
+    //     {
+    //         _userInput = value;
+
+    //         if (!string.IsNullOrWhiteSpace(_userInput) && SearchFunction is not null)
+    //             searchResults = SearchFunction(_userInput);
+    //     } 
+    // }
+
+    public string UserInput
+    {
         get => _userInput;
-        set 
+        set
         {
             _userInput = value;
 
             if (!string.IsNullOrWhiteSpace(_userInput) && SearchFunction is not null)
-                searchResults = SearchFunction(_userInput);
-        } 
+            {
+                // Run the search asynchronously
+                PerformSearchAsync(_userInput);
+            }
+        }
+    }
+
+    private async Task PerformSearchAsync(string input)
+    {
+        if (SearchFunction is not null)
+        {
+            searchResults = await SearchFunction(input);
+            // Handle the results
+            // For example, you can set a separate property to display the results in the UI
+            StateHasChanged(); // Trigger UI update
+        }
     }
 
     private void HandleSelectItem(ItemViewModel item)

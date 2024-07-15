@@ -9,7 +9,7 @@
 <br />
 
 <AutoCompleteComponent Label="Purchase Inventory"
-                       SearchFunction="SearchInventory"
+                       SearchFunction="SearchInventoryAsync"
                        OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
 <br />
 @selectedItem?.Name
@@ -17,10 +17,23 @@
 @code {
     private ItemViewModel? selectedItem;
 
-    private List<ItemViewModel>? SearchInventory(string name)
+    // private List<ItemViewModel>? SearchInventory(string name)
+    // {
+    //     // this blocks the current thread
+    //     var list = ViewInventoriesByNameUseCase.ExecuteAsync(name).GetAwaiter().GetResult();
+    //     if (list is null) return new List<ItemViewModel>();
+
+    //     return list.Select(
+    //         inventory => new ItemViewModel
+    //             {
+    //                 Id = inventory.InventoryId,
+    //                 Name = inventory.InventoryName
+    //             }).ToList();
+    // }
+
+    private async Task<List<ItemViewModel>> SearchInventoryAsync(string name)
     {
-        // this blocks the current thread
-        var list = ViewInventoriesByNameUseCase.ExecuteAsync(name).GetAwaiter().GetResult();
+        var list = await ViewInventoriesByNameUseCase.ExecuteAsync(name);
         if (list is null) return new List<ItemViewModel>();
 
         return list.Select(
