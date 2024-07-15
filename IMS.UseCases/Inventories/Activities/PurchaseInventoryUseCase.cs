@@ -18,6 +18,7 @@ namespace IMS.UseCases.Inventories.Activities
 
         public async Task ExecuteAsync(PurchaseOrderDTO purchaseOrderDTO)
         {
+            // insert a record in the transaction table
             await _inventoryTransactionRepository.PurchaseInventoryAsync(
                 purchaseOrderDTO.PurchaseNumber,
                 purchaseOrderDTO.Inventory,
@@ -25,6 +26,10 @@ namespace IMS.UseCases.Inventories.Activities
                 purchaseOrderDTO.DoneBy,
                 purchaseOrderDTO.Inventory.Price
                 );
+
+            // increase the quantity in the inventory table
+            purchaseOrderDTO.Inventory.Quantity += purchaseOrderDTO.Quantity;
+            await _inventoryRepository.UpdateInventoryAsync(purchaseOrderDTO.Inventory);
         }
     }
 }

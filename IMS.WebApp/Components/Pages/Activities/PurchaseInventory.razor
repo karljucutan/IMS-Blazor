@@ -1,22 +1,54 @@
 ﻿@page "/purchase"
+
 @rendermode InteractiveServer
 
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
 
 @inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
+@inject IViewInventoryByIdUseCase ViewInventoriesByIdUseCase
+@inject IPurchaseInventoryUseCase PuchaseInventoryUseCase
 
 <h3>Purchase Inventory</h3>
 <br />
 
-<AutoCompleteComponent Label="Purchase Inventory"
-                       SearchFunction="SearchInventoryAsync"
-                       OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
-<br />
-@selectedItem?.Name
+<EditForm Model="purchaseViewModel" OnValidSubmit="PurchaseAsync">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <div class="form-group">
+        <label for="po">Purchase Order</label>
+        <InputText id="po" @bind-Value="purchaseViewModel.PurchaseOrderNumber" class="form-control"></InputText>
+    </div>
+    <br />
+    <div class="card">
+        <div class="card-body">
+            <div class="form-group">
+                <AutoCompleteComponent Label="Inventory to Purchase"
+                                       SearchFunction="SearchInventoryAsync"
+                                       OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
+
+                @if (purchaseViewModel.InventoryPrice > 0)
+                {
+                    <text>Price: @purchaseViewModel.InventoryPrice.ToString("c")</text>
+                }
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="form-group">
+        <label for="quantity">Quantity</label>
+        <InputNumber id="quantity" @bind-Value="purchaseViewModel.QuantityToPurchase" class="form-control"></InputNumber>
+    </div>
+    <br />
+    <button type="submit" class="btn btn-primary">Purchase</button>
+</EditForm>
 
 @code {
-    private ItemViewModel? selectedItem;
+    private PurchaseViewModel purchaseViewModel = new();
+    private PurchaseOrderDTO purchaseOrderDTO = new();
+    private Inventory? selectedInventory;
 
+    #region sync implementation of SearchInventory
     // private List<ItemViewModel>? SearchInventory(string name)
     // {
     //     // this blocks the current thread
@@ -30,6 +62,7 @@
     //                 Name = inventory.InventoryName
     //             }).ToList();
     // }
+    #endregion
 
     private async Task<List<ItemViewModel>> SearchInventoryAsync(string name)
     {
@@ -44,8 +77,23 @@
                 }).ToList();
     }
 
-    private void HandleItemSelected(ItemViewModel item)
+    private async Task HandleItemSelected(ItemViewModel item)
     {
-        selectedItem = item;
+        selectedInventory = await ViewInventoriesByIdUseCase.ExecuteAsync(item.Id);
+
+        purchaseViewModel.InventoryId = item.Id;
+        purchaseViewModel.InventoryPrice = selectedInventory.Price;
+    }
+
+    private async Task PurchaseAsync()
+    {
+        purchaseOrderDTO.PurchaseNumber = purchaseViewModel.PurchaseOrderNumber;
+        purchaseOrderDTO.Inventory = selectedInventory;
+        purchaseOrderDTO.Quantity = purchaseViewModel.QuantityToPurchase;
+        purchaseOrderDTO.DoneBy = "Karl";
+
+        await PuchaseInventoryUseCase.ExecuteAsync(purchaseOrderDTO);
+        purchaseViewModel = new();
+        selectedInventory = null;
     }
 }
