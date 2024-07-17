@@ -1,6 +1,6 @@
 ﻿using IMS.UseCases.Inventories.DTOs;
 
-namespace IMS.UseCases.Inventories.Activities.Interfaces
+namespace IMS.UseCases.Activities.Interfaces
 {
     public interface IPurchaseInventoryUseCase
     {

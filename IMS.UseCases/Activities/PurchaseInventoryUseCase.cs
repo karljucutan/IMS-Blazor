@@ -1,8 +1,8 @@
-﻿using IMS.UseCases.Inventories.Activities.Interfaces;
+﻿using IMS.UseCases.Activities.Interfaces;
 using IMS.UseCases.Inventories.DTOs;
 using IMS.UseCases.PluginInterfaces;
 
-namespace IMS.UseCases.Inventories.Activities
+namespace IMS.UseCases.Activities
 {
     public class PurchaseInventoryUseCase : IPurchaseInventoryUseCase
     {
