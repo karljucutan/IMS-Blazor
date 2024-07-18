@@ -61,6 +61,7 @@
         selectedProduct = await ViewProductByIdUseCase.ExecuteAsync(item.Id);
 
         produceViewModel.ProductId = item.Id;
+        produceViewModel.Product = selectedProduct;
     }
 
     private async Task ProduceAsync()

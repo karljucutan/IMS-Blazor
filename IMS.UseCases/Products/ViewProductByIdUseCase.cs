@@ -13,6 +13,11 @@ namespace IMS.UseCases.Products
             _productRepository = productRepository;
         }
 
+
+        // TODO: Application layer should use DTO.
+        // Presentation (UI) layer should use ViewModel.
+        // Persistence layer should use Entity.
+        // ViewModel -> DTO -> Entity and vice versa
         public async Task<Product> ExecuteAsync(int productId)
         {
             return await _productRepository.GetProductByIdAsync(productId);
