@@ -7,6 +7,7 @@ namespace IMS.Plugins.InMemory
     {
         public List<InventoryTransaction> _inventoryTransactions = new();
 
+        // TODO: change to AddProduceProductAsync
         public Task ProduceProductAsync(string productionNumber, Inventory inventory, int quantityToConsume, string doneBy, int price)
         {
             _inventoryTransactions.Add(
@@ -25,6 +26,7 @@ namespace IMS.Plugins.InMemory
             return Task.CompletedTask;
         }
 
+        // TODO: change to AddProduceProductAsync
         public Task PurchaseInventoryAsync(string purchaseNumber, Inventory inventory, int quantity, string doneBy, double price)
         {
             _inventoryTransactions.Add(

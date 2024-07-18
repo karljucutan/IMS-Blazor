@@ -13,8 +13,8 @@ namespace IMS.Plugins.InMemory
             {
                 new Inventory { InventoryId = 1, InventoryName = "Bike Seat", Quantity = 10, Price = 2 },
                 new Inventory { InventoryId = 2, InventoryName = "Bike Body", Quantity = 10, Price = 2 },
-                new Inventory { InventoryId = 3, InventoryName = "Bike Wheels", Quantity = 10, Price = 2 },
-                new Inventory { InventoryId = 4, InventoryName = "Bike Pedals", Quantity = 10, Price = 2 },
+                new Inventory { InventoryId = 3, InventoryName = "Bike Wheels", Quantity = 20, Price = 2 },
+                new Inventory { InventoryId = 4, InventoryName = "Bike Pedals", Quantity = 20, Price = 2 },
             };
         }
 

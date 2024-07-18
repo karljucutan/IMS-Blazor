@@ -19,8 +19,10 @@ namespace IMS.Plugins.InMemory
             _inventoryRepository = inventoryRepository;
         }
 
+        // TODO: change to AddProduceProductAsync
         public async Task ProduceAsync(string productionNumber, Product product, int quantity, string doneBy)
         {
+            // TODO: transfer to the application layer ProduceProductUseCase. this method should be just adding ProductTransaction to follow SRP principle
             var productToUpdate = await _productRepository.GetProductByIdAsync(product.ProductId);
             if (productToUpdate is not null)
             {
