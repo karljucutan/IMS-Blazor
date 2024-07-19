@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\jsinterop.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IMS.Plugins\IMS.Plugins.InMemory\IMS.Plugins.InMemory.csproj" />
     <ProjectReference Include="..\IMS.UseCases\IMS.UseCases.csproj" />
   </ItemGroup>
@@ -17,6 +21,11 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Pages\Products\EditProduct.razor" />
+    <_ContentIncludedByDefault Remove="wwwroot\jsinterop.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\jsinterop.js" />
   </ItemGroup>
 
 </Project>

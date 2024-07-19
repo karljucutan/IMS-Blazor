@@ -4,6 +4,7 @@
 
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
 
+@inject IJSRuntime JSRuntime
 @inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
 @inject IViewInventoryByIdUseCase ViewInventoriesByIdUseCase
 @inject IPurchaseInventoryUseCase PuchaseInventoryUseCase
@@ -11,7 +12,7 @@
 <h3>Purchase Inventory</h3>
 <br />
 
-<EditForm Model="purchaseViewModel" OnValidSubmit="PurchaseAsync">
+<EditForm id="purchaseInventoryForm" Model="purchaseViewModel" OnValidSubmit="PurchaseAsync">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
@@ -63,6 +64,17 @@
     //             }).ToList();
     // }
     #endregion
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (firstRender)
+        {
+            // JS Interop preventFormSubmission manually created in jsinterop.js
+            JSRuntime.InvokeVoidAsync("preventFormSubmission", "purchaseInventoryForm");
+        }
+    }
 
     private async Task<List<ItemViewModel>> SearchInventoryAsync(string name)
     {
