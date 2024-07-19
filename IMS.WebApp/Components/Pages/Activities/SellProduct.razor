@@ -1,29 +1,29 @@
-﻿@page "/produce"
+﻿@page "/sell"
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
 
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSRuntime
-@inject IProduceProductUseCase ProduceProductUseCase
 @inject IViewProductByIdUseCase ViewProductByIdUseCase
 @inject IViewProductsByNameUseCase ViewProductsByNameUseCase
+@inject ISellProductUseCase SellProductUseCase
 
-<h3>Produce Product</h3>
+<h3>Sell Product</h3>
 <br />
 
-<EditForm id="produceProductForm" Model="produceViewModel" OnValidSubmit="ProduceAsync">
+<EditForm id="sellProductForm" Model="sellViewModel" OnValidSubmit="SellAsync">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
     <div class="form-group">
-        <label for="po">Production #</label>
-        <InputText id="po" @bind-Value="produceViewModel.ProductionNumber" class="form-control"></InputText>
+        <label for="po">Sales Order #</label>
+        <InputText id="po" @bind-Value="sellViewModel.SalesOrderNumber" class="form-control"></InputText>
     </div>
     <br />
     <div class="card">
         <div class="card-body">
             <div class="form-group">
-                <AutoCompleteComponent Label="Product to Produce"
+                <AutoCompleteComponent Label="Product to Sell"
                                        SearchFunction="SearchProductAsync"
                                        OnItemSelected="HandleItemSelected"></AutoCompleteComponent>
             </div>
@@ -32,15 +32,19 @@
     <br />
     <div class="form-group">
         <label for="quantity">Quantity</label>
-        <InputNumber id="quantity" @bind-Value="produceViewModel.QuantityToProduce" class="form-control"></InputNumber>
+        <InputNumber id="quantity" @bind-Value="sellViewModel.QuantityToSell" class="form-control"></InputNumber>
+    </div>
+    <div class="form-group">
+        <label for="quantity">Unit Price</label>
+        <InputNumber id="unitprice" @bind-Value="sellViewModel.UnitPrice" class="form-control"></InputNumber>
     </div>
     <br />
-    <button type="submit" class="btn btn-primary">Produce</button>
+    <button type="submit" class="btn btn-primary">Sell</button>
 </EditForm>
 
 
 @code {
-    private ProduceViewModel produceViewModel = new();
+    private SellViewModel sellViewModel = new();
     private Product? selectedProduct;
 
     protected override void OnAfterRender(bool firstRender)
@@ -50,7 +54,7 @@
         if (firstRender)
         {
             // JS Interop preventFormSubmission manually created in jsinterop.js
-            JSRuntime.InvokeVoidAsync("preventFormSubmission", "produceProductForm");
+            JSRuntime.InvokeVoidAsync("preventFormSubmission", "sellProductForm");
         }
     }
 
@@ -71,19 +75,26 @@
     {
         selectedProduct = await ViewProductByIdUseCase.ExecuteAsync(item.Id);
 
-        produceViewModel.ProductId = item.Id;
-        produceViewModel.Product = selectedProduct;
+        sellViewModel.ProductId = item.Id;
+        sellViewModel.Product = selectedProduct;
+        sellViewModel.UnitPrice = selectedProduct.Price; // TODO check UnitPrice formula when changing quantity should be multiplied
     }
 
-    private async Task ProduceAsync()
+    private async Task SellAsync()
     {
-        await ProduceProductUseCase.ExecuteAsync(
-            produceViewModel.ProductionNumber,
+
+        // TODO: Application layer should use DTO.
+        // Presentation (UI) layer should use ViewModel.
+        // Persistence layer should use Entity.
+        // ViewModel -> DTO -> Entity and vice versa
+        await SellProductUseCase.ExecuteAsync(sellViewModel.SalesOrderNumber,
             selectedProduct,
-            produceViewModel.QuantityToProduce,
+            sellViewModel.QuantityToSell,
+            sellViewModel.UnitPrice,
             "Karl");
 
-        produceViewModel = new();
+        sellViewModel = new();
         selectedProduct = null;
     }
 }
+

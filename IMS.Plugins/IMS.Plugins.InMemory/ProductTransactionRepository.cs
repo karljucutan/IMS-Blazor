@@ -59,7 +59,7 @@ namespace IMS.Plugins.InMemory
         }
 
         // TODO: change to AddSellProductTransactionAsync
-        public Task SellProductAsync(string salesOrderNumber, Product product, int quantity, string doneBy)
+        public Task SellProductAsync(string salesOrderNumber, Product product, int quantity, double unitPrice, string doneBy)
         {
             _productTransactions.Add(new ProductTransaction
             {
@@ -69,7 +69,7 @@ namespace IMS.Plugins.InMemory
                 QuantityBefore = product.Quantity,
                 QuantityAfter = product.Quantity - quantity,
                 DoneBy = doneBy,
-                UnitPrice = product.Price,
+                UnitPrice = unitPrice,
             });
 
             return Task.CompletedTask;
