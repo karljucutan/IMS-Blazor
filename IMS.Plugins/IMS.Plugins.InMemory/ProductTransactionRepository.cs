@@ -19,7 +19,7 @@ namespace IMS.Plugins.InMemory
             _inventoryRepository = inventoryRepository;
         }
 
-        // TODO: change to AddProduceProductAsync
+        // TODO: change to AddProduceProductTransactionAsync
         public async Task ProduceAsync(string productionNumber, Product product, int quantity, string doneBy)
         {
             // TODO: transfer to the application layer ProduceProductUseCase. this method should be just adding ProductTransaction to follow SRP principle
@@ -56,6 +56,23 @@ namespace IMS.Plugins.InMemory
                 TransactionDate = DateTime.UtcNow,
                 DoneBy = doneBy
             });
+        }
+
+        // TODO: change to AddSellProductTransactionAsync
+        public Task SellProductAsync(string salesOrderNumber, Product product, int quantity, string doneBy)
+        {
+            _productTransactions.Add(new ProductTransaction
+            {
+                ActivityType = ProductTransactionType.SellProduct,
+                SalesOrderNumber = salesOrderNumber,
+                ProductId = product.ProductId,
+                QuantityBefore = product.Quantity,
+                QuantityAfter = product.Quantity - quantity,
+                DoneBy = doneBy,
+                UnitPrice = product.Price,
+            });
+
+            return Task.CompletedTask;
         }
     }
 }
