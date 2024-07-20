@@ -17,7 +17,7 @@ namespace IMS.UseCases.Reports
             string inventoryName,
             DateTime? dateFrom,
             DateTime? dateTo,
-            InventoryTransactionType? transcationType)
+            InventoryTransactionType? activityType)
         {
             if (dateTo.HasValue) dateTo = dateTo.Value.AddDays(1);
 
@@ -25,7 +25,7 @@ namespace IMS.UseCases.Reports
                 inventoryName,
                 dateFrom,
                 dateTo,
-                transcationType);
+                activityType);
         }
     }
 }

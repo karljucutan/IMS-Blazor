@@ -1,5 +1,6 @@
 ﻿using IMS.CoreBusiness;
 using IMS.UseCases.PluginInterfaces;
+using System.Linq;
 
 namespace IMS.Plugins.InMemory
 {
@@ -14,9 +15,15 @@ namespace IMS.Plugins.InMemory
             _inventoryRepository = inventoryRepository;
         }
 
-        public async Task<IEnumerable<InventoryTransaction>> GetInventoryTransactionsAsync(string inventoryName, DateTime? dateFrom, DateTime? dateTo, InventoryTransactionType? transcationType)
+        public async Task<IEnumerable<InventoryTransaction>> GetInventoryTransactionsAsync(string inventoryName, DateTime? dateFrom, DateTime? dateTo, InventoryTransactionType? activityType)
         {
             var inventories = (await _inventoryRepository.GetInventoriesByNameAsync(string.Empty)).ToList();
+
+            //var inventTransc = _inventoryTransactions.FirstOrDefault();
+            //var invent = inventories.FirstOrDefault(x => x.InventoryId == inventTransc?.InventoryId);
+            //var test1 = (string.IsNullOrWhiteSpace(inventoryName) || (invent is not null && invent.InventoryName.Contains(inventoryName)));
+            //var test2 = (!dateFrom.HasValue || (inventTransc.TransactionDate >= dateFrom.Value.Date && inventTransc.TransactionDate <= dateTo.Value));
+            //var test3 = (!activityType.HasValue || inventTransc.ActivityType == activityType);
 
             var query = from it in _inventoryTransactions
                         join inv in inventories
@@ -24,7 +31,8 @@ namespace IMS.Plugins.InMemory
                         where
                             (string.IsNullOrWhiteSpace(inventoryName) || inv.InventoryName.Contains(inventoryName)) &&
                             (!dateFrom.HasValue || it.TransactionDate >= dateFrom.Value.Date) &&
-                            (!transcationType.HasValue || it.ActivityType == transcationType)
+                            (!dateTo.HasValue || it.TransactionDate <= dateTo.Value.Date) &&
+                            (!activityType.HasValue || it.ActivityType == activityType)
                         select new InventoryTransaction
                         {
                             Inventory = inv,
@@ -38,8 +46,8 @@ namespace IMS.Plugins.InMemory
                             DoneBy = it.DoneBy,
                             UnitPrice = it.UnitPrice,
                         };
-            
-            return query.ToList();
+
+            return query;
         }
 
         // TODO: change to AddProduceProductAsync
