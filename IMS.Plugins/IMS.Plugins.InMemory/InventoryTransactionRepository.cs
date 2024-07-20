@@ -5,7 +5,42 @@ namespace IMS.Plugins.InMemory
 {
     public class InventoryTransactionRepository : IInventoryTransactionRepository
     {
+        private readonly IInventoryRepository _inventoryRepository;
         public List<InventoryTransaction> _inventoryTransactions = new();
+
+        public InventoryTransactionRepository(IInventoryRepository inventoryRepository)
+        {
+            // TODO: injecting another repository in this repository is a violation of SRP
+            _inventoryRepository = inventoryRepository;
+        }
+
+        public async Task<IEnumerable<InventoryTransaction>> GetInventoryTransactionsAsync(string inventoryName, DateTime? dateFrom, DateTime? dateTo, InventoryTransactionType? transcationType)
+        {
+            var inventories = (await _inventoryRepository.GetInventoriesByNameAsync(string.Empty)).ToList();
+
+            var query = from it in _inventoryTransactions
+                        join inv in inventories
+                        on it.InventoryId equals inv.InventoryId
+                        where
+                            (string.IsNullOrWhiteSpace(inventoryName) || inv.InventoryName.Contains(inventoryName)) &&
+                            (!dateFrom.HasValue || it.TransactionDate >= dateFrom.Value.Date) &&
+                            (!transcationType.HasValue || it.ActivityType == transcationType)
+                        select new InventoryTransaction
+                        {
+                            Inventory = inv,
+                            InventoryTransactionId = it.InventoryTransactionId,
+                            PurchaseOrderNumber = it.PurchaseOrderNumber,
+                            InventoryId = it.InventoryId,
+                            QuantityBefore = it.QuantityBefore,
+                            ActivityType = it.ActivityType,
+                            QuantityAfter = it.QuantityAfter,
+                            TransactionDate = it.TransactionDate,
+                            DoneBy = it.DoneBy,
+                            UnitPrice = it.UnitPrice,
+                        };
+            
+            return query.ToList();
+        }
 
         // TODO: change to AddProduceProductAsync
         public Task ProduceProductAsync(string productionNumber, Inventory inventory, int quantityToConsume, string doneBy, int price)
