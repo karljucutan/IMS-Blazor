@@ -49,6 +49,7 @@
                 <th>Activity</th>
                 <th>Qty Before</th>
                 <th>Qty After</th>
+                <th>Unit Price</th>
                 <th>PO #</th>
                 <th>Production #</th>
             </tr>
@@ -62,6 +63,7 @@
                     <td>@inventoryTransaction.ActivityType.GetEnumName()</td>
                     <td>@inventoryTransaction.QuantityBefore</td>
                     <td>@inventoryTransaction.QuantityAfter</td>
+                    <td>@(inventoryTransaction.UnitPrice > 0 ? inventoryTransaction.UnitPrice.ToString("c") : "N/A")</td>
                     <td>@inventoryTransaction.PurchaseOrderNumber</td>
                     <td>@inventoryTransaction.ProductionNumber</td>
                 </tr>
