@@ -19,6 +19,35 @@ namespace IMS.Plugins.InMemory
             _inventoryRepository = inventoryRepository;
         }
 
+        public async Task<IEnumerable<ProductTransaction>> GetProductTransactionsAsync(string productName, DateTime? dateFrom, DateTime? dateTo, ProductTransactionType? activityType)
+        {
+            var products = (await _productRepository.GetProductsByNameAsync(string.Empty)).ToList();
+
+            var query = from pt in _productTransactions
+                        join inv in products
+                        on pt.ProductId equals inv.ProductId
+                        where
+                            (string.IsNullOrWhiteSpace(productName) || inv.ProductName.Contains(productName)) &&
+                            (!dateFrom.HasValue || pt.TransactionDate >= dateFrom.Value.Date) &&
+                            (!dateTo.HasValue || pt.TransactionDate <= dateTo.Value.Date) &&
+                            (!activityType.HasValue || pt.ActivityType == activityType)
+                        select new ProductTransaction
+                        {
+                            Product = inv,
+                            ProductTransactionId = pt.ProductTransactionId,
+                            SalesOrderNumber = pt.SalesOrderNumber,
+                            ProductId = pt.ProductId,
+                            QuantityBefore = pt.QuantityBefore,
+                            ActivityType = pt.ActivityType,
+                            QuantityAfter = pt.QuantityAfter,
+                            TransactionDate = pt.TransactionDate,
+                            DoneBy = pt.DoneBy,
+                            UnitPrice = pt.UnitPrice,
+                        };
+
+            return query;
+        }
+
         // TODO: change to AddProduceProductTransactionAsync
         public async Task ProduceAsync(string productionNumber, Product product, int quantity, string doneBy)
         {
