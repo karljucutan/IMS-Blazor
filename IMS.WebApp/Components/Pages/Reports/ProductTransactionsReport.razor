@@ -3,74 +3,77 @@
 @rendermode InteractiveServer
 
 @inject ISearchProductTransactionsUseCase SearchProductTransactionsUseCase
+@inject IJSRuntime JSRuntime
 
 <h3>Product Transactions Report</h3>
 <br />
 
-<div class="row">
-    <div class="col">
-        <label for="productName">Product Name</label>
-        <InputText id="productName" class="form-control" @bind-Value="productName" />
+<div id="printarea">
+    <div class="row">
+        <div class="col">
+            <label for="productName">Product Name</label>
+            <InputText id="productName" class="form-control" @bind-Value="productName" />
+        </div>
+        <div class="col">
+            <label for="dateFrom">Date From</label>
+            <InputDate id="dateFrom" class="form-control" @bind-Value="dateFrom" />
+        </div>
+        <div class="col">
+            <label for="dateTo">Date To</label>
+            <InputDate id="dateTo" class="form-control" @bind-Value="dateTo" />
+        </div>
+        <div class="col">
+            <label for="activityType">Activtity Type</label>
+            <InputSelect id="activityType" class="form-control" @bind-Value="activityType">
+                <option>Select</option>
+                <option value="@ProductTransactionType.ProduceProduct">@ProductTransactionType.ProduceProduct.GetEnumName()</option>
+                <option value="@ProductTransactionType.SellProduct">@ProductTransactionType.SellProduct.GetEnumName()</option>
+            </InputSelect>
+        </div>
+        <div class="col">
+            <label></label>
+            <button type="button" class="btn btn-primary form-control" @onclick="SearchProductsAsync">Search</button>
+        </div>
+        <div class="col">
+            <label></label>
+            <button type="button" class="btn btn-primary form-control" @onclick="PrintAsync">Print</button>
+        </div>
     </div>
-    <div class="col">
-        <label for="dateFrom">Date From</label>
-        <InputDate id="dateFrom" class="form-control" @bind-Value="dateFrom" />
-    </div>
-    <div class="col">
-        <label for="dateTo">Date To</label>
-        <InputDate id="dateTo" class="form-control" @bind-Value="dateTo" />
-    </div>
-    <div class="col">
-        <label for="activityType">Activtity Type</label> 
-        <InputSelect id="activityType" class="form-control" @bind-Value="activityType">
-            <option>Select</option>
-            <option value="@ProductTransactionType.ProduceProduct">@ProductTransactionType.ProduceProduct.GetEnumName()</option>
-            <option value="@ProductTransactionType.SellProduct">@ProductTransactionType.SellProduct.GetEnumName()</option>
-        </InputSelect>
-    </div>
-    <div class="col">
-        <label></label>
-        <button type="button" class="btn btn-primary form-control" @onclick="SearchProductsAsync">Search</button>
-    </div>
-    <div class="col">
-        <label></label>
-        <button type="button" class="btn btn-primary form-control" @onclick="PrintAsync">Print</button>
-    </div>
-</div>
 
-@if (productTransactions.Any())
-{
-    <br />
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Product</th>
-                <th>Activity</th>
-                <th>Qty Before</th>
-                <th>Qty After</th>
-                <th>Unit Price</th>
-                <th>SO #</th>
-                <th>Production #</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var productTransaction in productTransactions)
-            {
+    @if (productTransactions.Any())
+    {
+        <br />
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>@productTransaction.TransactionDate.ToString("MM/dd/yyyy")</td>
-                    <td>@productTransaction.Product?.ProductName</td>
-                    <td>@productTransaction.ActivityType.GetEnumName()</td>
-                    <td>@productTransaction.QuantityBefore</td>
-                    <td>@productTransaction.QuantityAfter</td>
-                    <td>@productTransaction.UnitPrice?.ToString("c")</td>
-                    <td>@productTransaction.SalesOrderNumber</td>
-                    <td>@productTransaction.ProductionNumber</td>
+                    <th>Date</th>
+                    <th>Product</th>
+                    <th>Activity</th>
+                    <th>Qty Before</th>
+                    <th>Qty After</th>
+                    <th>Unit Price</th>
+                    <th>SO #</th>
+                    <th>Production #</th>
                 </tr>
-            }
-        </tbody>
-    </table>
-}
+            </thead>
+            <tbody>
+                @foreach (var productTransaction in productTransactions)
+                {
+                    <tr>
+                        <td>@productTransaction.TransactionDate.ToString("MM/dd/yyyy")</td>
+                        <td>@productTransaction.Product?.ProductName</td>
+                        <td>@productTransaction.ActivityType.GetEnumName()</td>
+                        <td>@productTransaction.QuantityBefore</td>
+                        <td>@productTransaction.QuantityAfter</td>
+                        <td>@productTransaction.UnitPrice?.ToString("c")</td>
+                        <td>@productTransaction.SalesOrderNumber</td>
+                        <td>@productTransaction.ProductionNumber</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
 
 @code {
     private string productName = string.Empty;
@@ -86,6 +89,6 @@
 
     private async Task PrintAsync()
     {
-
+        await JSRuntime.InvokeVoidAsync("print");
     }
 }
