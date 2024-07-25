@@ -1,7 +1,7 @@
-﻿using IMS.WebApp.ViewModels;
+﻿using IMS.UseCases.ViewModels;
 using System.ComponentModel.DataAnnotations;
 
-namespace IMS.WebApp.ViewModelsValidations
+namespace IMS.UseCases.ViewModelsValidations
 {
     public class Produce_EnsureEnoughInventoryQuantity : ValidationAttribute
     {

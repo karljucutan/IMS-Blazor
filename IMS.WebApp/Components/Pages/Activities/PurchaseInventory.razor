@@ -1,5 +1,6 @@
 ﻿@page "/purchase"
 
+
 @rendermode InteractiveServer
 
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
@@ -8,6 +9,7 @@
 @inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
 @inject IViewInventoryByIdUseCase ViewInventoriesByIdUseCase
 @inject IPurchaseInventoryUseCase PuchaseInventoryUseCase
+@inject IMapper Mapper
 
 <h3>Purchase Inventory</h3>
 <br />
@@ -47,7 +49,7 @@
 @code {
     private PurchaseViewModel purchaseViewModel = new();
     private PurchaseOrderDTO purchaseOrderDTO = new();
-    private Inventory? selectedInventory;
+    private InventoryViewModel? selectedInventory;
 
     #region sync implementation of SearchInventory
     // private List<ItemViewModel>? SearchInventory(string name)
@@ -100,10 +102,11 @@
     private async Task PurchaseAsync()
     {
         purchaseOrderDTO.PurchaseNumber = purchaseViewModel.PurchaseOrderNumber;
-        purchaseOrderDTO.Inventory = selectedInventory;
+        purchaseOrderDTO.Inventory = Mapper.Map<Inventory>(selectedInventory);
         purchaseOrderDTO.Quantity = purchaseViewModel.QuantityToPurchase;
         purchaseOrderDTO.DoneBy = "Karl";
 
+        // TODO: Create ViewModel (UI), DTO (Application), DB (Infra) 
         await PuchaseInventoryUseCase.ExecuteAsync(purchaseOrderDTO);
         purchaseViewModel = new();
         selectedInventory = null;

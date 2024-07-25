@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace IMS.WebApp.ViewModels
+namespace IMS.UseCases.ViewModels
 {
     public class PurchaseViewModel
     {

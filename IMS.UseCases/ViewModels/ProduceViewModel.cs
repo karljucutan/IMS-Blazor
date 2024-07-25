@@ -1,8 +1,8 @@
 ﻿using IMS.CoreBusiness;
-using IMS.WebApp.ViewModelsValidations;
+using IMS.UseCases.ViewModelsValidations;
 using System.ComponentModel.DataAnnotations;
 
-namespace IMS.WebApp.ViewModels
+namespace IMS.UseCases.ViewModels
 {
     public class ProduceViewModel
     {

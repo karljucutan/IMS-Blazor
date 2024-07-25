@@ -2,6 +2,7 @@
 
 @inject IAddInventoryUseCase AddInventoryUseCase
 @inject NavigationManager NavigationManager
+@inject IMapper Mapper
 
 <h3>Add Inventory</h3>
 <i class="fs-6 fst-italic">
@@ -13,35 +14,35 @@
 
 <br />
 
-<EditForm Model="Inventory" FormName="formInventory" OnValidSubmit="Save">
+<EditForm Model="InventoryViewModel" FormName="formInventory" OnValidSubmit="Save">
     <DataAnnotationsValidator></DataAnnotationsValidator>
     <ValidationSummary></ValidationSummary>
 
     <div class="form-group">
         <label for="name">Inventory Name</label>
         <InputText id="name"
-                   @bind-Value="Inventory.InventoryName"
+                   @bind-Value="InventoryViewModel.InventoryName"
                    class="form-control">
         </InputText>
-        <ValidationMessage For="() => Inventory.InventoryName"></ValidationMessage>
+        <ValidationMessage For="() => InventoryViewModel.InventoryName"></ValidationMessage>
     </div>
 
     <div class="form-group">
         <label for="quantity">Quantity</label>
         <InputNumber id="quantity"
-                     @bind-Value="Inventory.Quantity"
+                     @bind-Value="InventoryViewModel.Quantity"
                      class="form-control">
         </InputNumber>
-        <ValidationMessage For="() => Inventory.Quantity"></ValidationMessage>
+        <ValidationMessage For="() => InventoryViewModel.Quantity"></ValidationMessage>
     </div>
 
     <div class="form-group">
         <label for="price">Price</label>
         <InputNumber id="price"
-                     @bind-Value="Inventory.Price"
+                     @bind-Value="InventoryViewModel.Price"
                      class="form-control">
         </InputNumber>
-        <ValidationMessage For="() => Inventory.Price"></ValidationMessage>
+        <ValidationMessage For="() => InventoryViewModel.Price"></ValidationMessage>
     </div>
     <br />
     <button type="submit" class="btn btn-primary">Save</button>
@@ -50,11 +51,12 @@
 
 @code {
     [SupplyParameterFromForm]
-    private Inventory Inventory { get; set; } = new();
+    private InventoryViewModel InventoryViewModel { get; set; } = new();
 
     private async Task Save()
     {
-        await AddInventoryUseCase.ExecuteAsync(Inventory);
+        // reason for recurssion issue on Inventory Entity as per the course is due to it is Static Side Rendering, thats why it is changed to ViewModel
+        await AddInventoryUseCase.ExecuteAsync(Mapper.Map<Inventory>(InventoryViewModel));
 
         NavigationManager.NavigateTo("/inventories");
     }

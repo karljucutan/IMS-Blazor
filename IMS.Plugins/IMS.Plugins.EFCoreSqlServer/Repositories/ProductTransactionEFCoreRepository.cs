@@ -3,7 +3,7 @@ using IMS.Plugins.EFCoreSqlServer;
 using IMS.UseCases.PluginInterfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace IMS.Plugins.InMemory
+namespace IMS.Plugins.EFCoreSqlServer.Repositories
 {
     public class ProductTransactionEFCoreRepository : IProductTransactionRepository
     {
@@ -28,14 +28,14 @@ namespace IMS.Plugins.InMemory
             using var db = await _dbContextFactory.CreateDbContextAsync();
 
             var query = (from pt in db.ProductTransactions
-                        join inv in db.Products
-                        on pt.ProductId equals inv.ProductId
-                        where
-                            (string.IsNullOrWhiteSpace(productName) || inv.ProductName.Contains(productName)) &&
-                            (!dateFrom.HasValue || pt.TransactionDate >= dateFrom.Value.Date) &&
-                            (!dateTo.HasValue || pt.TransactionDate <= dateTo.Value.Date) &&
-                            (!activityType.HasValue || pt.ActivityType == activityType)
-                        select pt)
+                         join inv in db.Products
+                         on pt.ProductId equals inv.ProductId
+                         where
+                             (string.IsNullOrWhiteSpace(productName) || inv.ProductName.Contains(productName)) &&
+                             (!dateFrom.HasValue || pt.TransactionDate >= dateFrom.Value.Date) &&
+                             (!dateTo.HasValue || pt.TransactionDate <= dateTo.Value.Date) &&
+                             (!activityType.HasValue || pt.ActivityType == activityType)
+                         select pt)
                         .Include(x => x.Product);
 
             return await query.ToListAsync();

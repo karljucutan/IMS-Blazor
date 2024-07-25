@@ -1,8 +1,10 @@
+using AutoMapper;
 using IMS.Plugins.EFCoreSqlServer;
 using IMS.Plugins.EFCoreSqlServer.Repositories;
 using IMS.Plugins.InMemory;
 using IMS.UseCases.Activities;
 using IMS.UseCases.Activities.Interfaces;
+using IMS.UseCases.AutoMapper;
 using IMS.UseCases.Inventories;
 using IMS.UseCases.Inventories.Interfaces;
 using IMS.UseCases.PluginInterfaces;
@@ -33,6 +35,15 @@ builder.Services.AddDbContextFactory<IMSDbContext>(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+builder.Services.AddTransient<IMapper>(provider => {
+    var mc = new MapperConfiguration(mc =>
+    {
+        mc.AddProfile(new AutoMapperProfile());
+    });
+
+    return mc.CreateMapper();
+});
+
 builder.Services.AddSingleton<IInventoryRepository, InventoryRepository>();
 builder.Services.AddSingleton<IProductRepository, ProductRepository>();
 builder.Services.AddSingleton<IInventoryTransactionRepository, InventoryTransactionRepository>();
@@ -56,6 +67,8 @@ builder.Services.AddTransient<ISellProductUseCase, SellProductUseCase>();
 
 builder.Services.AddTransient<ISearchInventoryTransactionsUseCase, SearchInventoryTransactionsUseCase>();
 builder.Services.AddTransient<ISearchProductTransactionsUseCase, SearchProductTransactionsUseCase>();
+
+
 
 var app = builder.Build();
 

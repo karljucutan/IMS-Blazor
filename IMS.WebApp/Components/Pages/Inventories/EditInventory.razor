@@ -3,6 +3,7 @@
 @inject IViewInventoryByIdUseCase ViewInventoryByIdUseCase
 @inject IEditInventoryUseCase EditInventoryUseCase
 @inject NavigationManager NavigationManager
+@inject IMapper Mapper
 
 <h3>Edit Inventory</h3>
 <i class="fs-6 fst-italic">
@@ -13,39 +14,39 @@
 </i>
 
 <br />
-@if (Inventory is not null)
+@if (InventoryViewModel is not null)
 {
-    <EditForm Model="Inventory" FormName="formInventory" OnValidSubmit="Update">
+    <EditForm Model="InventoryViewModel" FormName="formInventory" OnValidSubmit="Update">
         <DataAnnotationsValidator></DataAnnotationsValidator>
         <ValidationSummary></ValidationSummary>
 
-        <InputNumber @bind-Value="Inventory.InventoryId" hidden></InputNumber>
+        <InputNumber @bind-Value="InventoryViewModel.InventoryId" hidden></InputNumber>
 
         <div class="form-group">
             <label for="name">Inventory Name</label>
             <InputText id="name"
-                       @bind-Value="Inventory.InventoryName"
+                       @bind-Value="InventoryViewModel.InventoryName"
                        class="form-control">
             </InputText>
-            <ValidationMessage For="() => Inventory.InventoryName"></ValidationMessage>
+            <ValidationMessage For="() => InventoryViewModel.InventoryName"></ValidationMessage>
         </div>
 
         <div class="form-group">
             <label for="quantity">Quantity</label>
             <InputNumber id="quantity"
-                         @bind-Value="Inventory.Quantity"
+                         @bind-Value="InventoryViewModel.Quantity"
                          class="form-control">
             </InputNumber>
-            <ValidationMessage For="() => Inventory.Quantity"></ValidationMessage>
+            <ValidationMessage For="() => InventoryViewModel.Quantity"></ValidationMessage>
         </div>
 
         <div class="form-group">
             <label for="price">Price</label>
             <InputNumber id="price"
-                         @bind-Value="Inventory.Price"
+                         @bind-Value="InventoryViewModel.Price"
                          class="form-control">
             </InputNumber>
-            <ValidationMessage For="() => Inventory.Price"></ValidationMessage>
+            <ValidationMessage For="() => InventoryViewModel.Price"></ValidationMessage>
         </div>
         <br />
         <button type="submit" class="btn btn-primary">Update</button>
@@ -57,18 +58,18 @@
     [Parameter]
     public int InventoryId { get; set; }
     [SupplyParameterFromForm]
-    private Inventory? Inventory { get; set; }
+    private InventoryViewModel? InventoryViewModel { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        Inventory ??= await ViewInventoryByIdUseCase.ExecuteAsync(InventoryId);
+        InventoryViewModel ??= await ViewInventoryByIdUseCase.ExecuteAsync(InventoryId);
     }
 
     private async Task Update()
     {
-        if (Inventory is not null)
+        if (InventoryViewModel is not null)
         {
-            await EditInventoryUseCase.ExecuteAsync(Inventory);
+            await EditInventoryUseCase.ExecuteAsync(Mapper.Map<Inventory>(InventoryViewModel));
             NavigationManager.NavigateTo("/inventories");
         }
     }
