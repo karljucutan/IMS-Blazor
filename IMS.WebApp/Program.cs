@@ -1,4 +1,5 @@
 using IMS.Plugins.EFCoreSqlServer;
+using IMS.Plugins.EFCoreSqlServer.Repositories;
 using IMS.Plugins.InMemory;
 using IMS.UseCases.Activities;
 using IMS.UseCases.Activities.Interfaces;
