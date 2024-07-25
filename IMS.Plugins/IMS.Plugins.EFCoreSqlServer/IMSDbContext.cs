@@ -5,6 +5,9 @@ namespace IMS.Plugins.EFCoreSqlServer
 {
     public class IMSDbContext : DbContext
     {
+        public IMSDbContext(DbContextOptions<IMSDbContext> options)
+        : base(options) {}
+
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductInventory> ProductInventories { get; set; }
@@ -46,7 +49,7 @@ namespace IMS.Plugins.EFCoreSqlServer
                 new ProductInventory { ProductId = 1, InventoryId = 1, InventoryQuantity = 1 },
                 new ProductInventory { ProductId = 1, InventoryId = 2, InventoryQuantity = 1 },
                 new ProductInventory { ProductId = 1, InventoryId = 3, InventoryQuantity = 2 },
-                new ProductInventory { ProductId = 1, InventoryId = 2, InventoryQuantity = 2 });
+                new ProductInventory { ProductId = 1, InventoryId = 4, InventoryQuantity = 2 });
         }
     }
 }

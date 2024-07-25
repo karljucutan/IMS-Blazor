@@ -1,3 +1,4 @@
+using IMS.Plugins.EFCoreSqlServer;
 using IMS.Plugins.InMemory;
 using IMS.UseCases.Activities;
 using IMS.UseCases.Activities.Interfaces;
@@ -9,10 +10,25 @@ using IMS.UseCases.Products.Interfaces;
 using IMS.UseCases.Reports;
 using IMS.UseCases.Reports.Interfaces;
 using IMS.WebApp.Components;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+// dont use AddDbContext due to the lifetime service of blazor server
+builder.Services.AddDbContextFactory<IMSDbContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("AZURE_SQL_IMS"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5, // Number of retry attempts
+            maxRetryDelay: TimeSpan.FromSeconds(30), // Maximum delay between retries
+            errorNumbersToAdd: null); // Specific SQL error numbers to consider transient (null means all transient errors)
+        });
+});
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
