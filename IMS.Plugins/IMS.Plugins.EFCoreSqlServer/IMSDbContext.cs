@@ -13,7 +13,7 @@ namespace IMS.Plugins.EFCoreSqlServer
         public DbSet<ProductInventory> ProductInventories { get; set; }
 
         public DbSet<InventoryTransaction> InventoryTransactions { get; set; }
-        public DbSet<InventoryTransaction> ProductTransactions { get; set; }
+        public DbSet<ProductTransaction> ProductTransactions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

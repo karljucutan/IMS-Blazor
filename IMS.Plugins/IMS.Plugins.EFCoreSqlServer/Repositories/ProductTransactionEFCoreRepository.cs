@@ -1,19 +1,23 @@
 ﻿using IMS.CoreBusiness;
+using IMS.Plugins.EFCoreSqlServer;
 using IMS.UseCases.PluginInterfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace IMS.Plugins.InMemory
 {
-    public class ProductTransactionRepository : IProductTransactionRepository
+    public class ProductTransactionEFCoreRepository : IProductTransactionRepository
     {
+        private readonly IDbContextFactory<IMSDbContext> _dbContextFactory;
         private readonly IProductRepository _productRepository;
         private readonly IInventoryTransactionRepository _inventoryTransactionRepository;
         private readonly IInventoryRepository _inventoryRepository;
-        private List<ProductTransaction> _productTransactions = new();
 
-        public ProductTransactionRepository(IProductRepository productRepository,
+        public ProductTransactionEFCoreRepository(IDbContextFactory<IMSDbContext> dbContextFactory,
+            IProductRepository productRepository,
             IInventoryTransactionRepository inventoryTransactionRepository,
             IInventoryRepository inventoryRepository)
         {
+            _dbContextFactory = dbContextFactory;
             _productRepository = productRepository;
             _inventoryTransactionRepository = inventoryTransactionRepository;
             _inventoryRepository = inventoryRepository;
@@ -21,35 +25,27 @@ namespace IMS.Plugins.InMemory
 
         public async Task<IEnumerable<ProductTransaction>> GetProductTransactionsAsync(string productName, DateTime? dateFrom, DateTime? dateTo, ProductTransactionType? activityType)
         {
-            var products = (await _productRepository.GetProductsByNameAsync(string.Empty)).ToList();
+            using var db = await _dbContextFactory.CreateDbContextAsync();
 
-            var query = from pt in _productTransactions
-                        join inv in products
+            var query = (from pt in db.ProductTransactions
+                        join inv in db.Products
                         on pt.ProductId equals inv.ProductId
                         where
                             (string.IsNullOrWhiteSpace(productName) || inv.ProductName.Contains(productName)) &&
                             (!dateFrom.HasValue || pt.TransactionDate >= dateFrom.Value.Date) &&
                             (!dateTo.HasValue || pt.TransactionDate <= dateTo.Value.Date) &&
                             (!activityType.HasValue || pt.ActivityType == activityType)
-                        select new ProductTransaction
-                        {
-                            Product = inv,
-                            ProductTransactionId = pt.ProductTransactionId,
-                            SalesOrderNumber = pt.SalesOrderNumber,
-                            ProductId = pt.ProductId,
-                            QuantityBefore = pt.QuantityBefore,
-                            ActivityType = pt.ActivityType,
-                            QuantityAfter = pt.QuantityAfter,
-                            TransactionDate = pt.TransactionDate,
-                            DoneBy = pt.DoneBy,
-                            UnitPrice = pt.UnitPrice,
-                        };
+                        select pt)
+                        .Include(x => x.Product);
 
-            return query;
+            return await query.ToListAsync();
         }
 
         public async Task ProduceAsync(string productionNumber, Product product, int quantity, string doneBy)
         {
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            // TODO: this part can be move to the application layer since this is not related to ProductTransaction.
             var productToUpdate = await _productRepository.GetProductByIdAsync(product.ProductId);
             if (productToUpdate is not null)
             {
@@ -71,9 +67,10 @@ namespace IMS.Plugins.InMemory
                     }
                 }
             }
+            // TODO: end
 
             // add product transaction
-            _productTransactions.Add(new ProductTransaction
+            await db.ProductTransactions.AddAsync(new ProductTransaction
             {
                 ProductionNumber = productionNumber,
                 ProductId = product.ProductId,
@@ -83,11 +80,15 @@ namespace IMS.Plugins.InMemory
                 TransactionDate = DateTime.UtcNow,
                 DoneBy = doneBy
             });
+
+            await db.SaveChangesAsync();
         }
 
-        public Task SellProductAsync(string salesOrderNumber, Product product, int quantity, double unitPrice, string doneBy)
+        public async Task SellProductAsync(string salesOrderNumber, Product product, int quantity, double unitPrice, string doneBy)
         {
-            _productTransactions.Add(new ProductTransaction
+            using var db = await _dbContextFactory.CreateDbContextAsync();
+
+            await db.ProductTransactions.AddAsync(new ProductTransaction
             {
                 ActivityType = ProductTransactionType.SellProduct,
                 SalesOrderNumber = salesOrderNumber,
@@ -98,7 +99,7 @@ namespace IMS.Plugins.InMemory
                 UnitPrice = unitPrice,
             });
 
-            return Task.CompletedTask;
+            await db.SaveChangesAsync();
         }
     }
 }
