@@ -26,7 +26,7 @@ builder.Services.AddDbContextFactory<IMSDbContext>(options =>
         sqlServerOptionsAction: sqlOptions =>
         {
             sqlOptions.EnableRetryOnFailure(
-            maxRetryCount: 5, // Number of retry attempts
+            maxRetryCount: 15, // Number of retry attempts
             maxRetryDelay: TimeSpan.FromSeconds(30), // Maximum delay between retries
             errorNumbersToAdd: null); // Specific SQL error numbers to consider transient (null means all transient errors)
         });
@@ -44,10 +44,20 @@ builder.Services.AddTransient<IMapper>(provider => {
     return mc.CreateMapper();
 });
 
-builder.Services.AddSingleton<IInventoryRepository, InventoryRepository>();
-builder.Services.AddSingleton<IProductRepository, ProductRepository>();
-builder.Services.AddSingleton<IInventoryTransactionRepository, InventoryTransactionRepository>();
-builder.Services.AddSingleton<IProductTransactionRepository, ProductTransactionRepository>();
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    builder.Services.AddSingleton<IInventoryRepository, InventoryRepository>();
+    builder.Services.AddSingleton<IProductRepository, ProductRepository>();
+    builder.Services.AddSingleton<IInventoryTransactionRepository, InventoryTransactionRepository>();
+    builder.Services.AddSingleton<IProductTransactionRepository, ProductTransactionRepository>();
+}
+else
+{
+    builder.Services.AddTransient<IInventoryRepository, InventoryEFCoreRepository>();
+    builder.Services.AddTransient<IProductRepository, ProductEFCoreRepository>();
+    builder.Services.AddTransient<IInventoryTransactionRepository, InventoryTransactionEFCoreRepository>();
+    builder.Services.AddTransient<IProductTransactionRepository, ProductTransactionEFCoreRepository>();
+}
 
 builder.Services.AddTransient<IViewInventoriesByNameUseCase, ViewInventoriesByNameUseCase>();
 builder.Services.AddTransient<IAddInventoryUseCase, AddInventoryUseCase>();

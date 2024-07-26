@@ -46,7 +46,10 @@ namespace IMS.Plugins.EFCoreSqlServer.Repositories
         public async Task<Product> GetProductByIdAsync(int productId)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
-            var product = await db.Products.FindAsync(productId);
+            var product = await db.Products
+                .Include(x => x.ProductInventories)
+                .ThenInclude(x => x.Inventory)
+                .FirstOrDefaultAsync(x => x.ProductId == productId);
 
             return product;
         }
@@ -54,7 +57,9 @@ namespace IMS.Plugins.EFCoreSqlServer.Repositories
         public async Task UpdateProductAsync(Product product)
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
-            var productToUpdate = await db.Products.FindAsync(product.ProductId);
+            var productToUpdate = await db.Products
+                .Include(x => x.ProductInventories)
+                .FirstOrDefaultAsync(x => x.ProductId == product.ProductId);
             //ArgumentNullException.ThrowIfNull(productToUpdate, nameof(productToUpdate));
             if (productToUpdate is null) return;
 
