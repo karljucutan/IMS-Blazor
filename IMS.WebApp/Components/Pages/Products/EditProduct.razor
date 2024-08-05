@@ -1,5 +1,7 @@
 ﻿@page "/editproduct/{ProductId:int}"
 
+@attribute [Authorize]
+
 @rendermode InteractiveServer
 
 @inject IViewProductByIdUseCase ViewProductByIdUseCase

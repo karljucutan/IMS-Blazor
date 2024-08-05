@@ -1,5 +1,7 @@
 ﻿@page "/editinventory/{InventoryId:int}"
 
+@attribute [Authorize]
+
 @inject IViewInventoryByIdUseCase ViewInventoryByIdUseCase
 @inject IEditInventoryUseCase EditInventoryUseCase
 @inject NavigationManager NavigationManager

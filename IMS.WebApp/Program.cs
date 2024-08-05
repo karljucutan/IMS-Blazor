@@ -1,4 +1,5 @@
 using AutoMapper;
+using IMS.Plugins.Accounts.EFCoreSqlserver;
 using IMS.Plugins.EFCoreSqlServer;
 using IMS.Plugins.EFCoreSqlServer.Repositories;
 using IMS.Plugins.InMemory;
@@ -13,11 +14,51 @@ using IMS.UseCases.Products.Interfaces;
 using IMS.UseCases.Reports;
 using IMS.UseCases.Reports.Interfaces;
 using IMS.WebApp.Components;
+using IMS.WebApp.Components.Account;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Accounts
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IdentityUserAccessor>();
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<AuthenticationStateProvider, ServerAuthenticationStateProvider>();
+
+builder.Services.AddAuthorization();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = IdentityConstants.ApplicationScheme;
+    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+}).AddIdentityCookies();
+
+builder.Services.AddDbContextFactory<AccountsDbContext>(options =>
+{
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("AZURE_SQL_ACCOUNTS"),
+        sqlServerOptionsAction: sqlOptions =>
+        {
+            sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 15, // Number of retry attempts
+            maxRetryDelay: TimeSpan.FromSeconds(30), // Maximum delay between retries
+            errorNumbersToAdd: null); // Specific SQL error numbers to consider transient (null means all transient errors)
+        });
+});
+builder.Services.AddDatabaseDeveloperPageExceptionFilter();
+
+builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<AccountsDbContext>()
+    .AddSignInManager()
+    .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
+
+// IMS
 // dont use AddDbContext due to the lifetime service of blazor server
 builder.Services.AddDbContextFactory<IMSDbContext>(options =>
 {
@@ -35,7 +76,8 @@ builder.Services.AddDbContextFactory<IMSDbContext>(options =>
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddTransient<IMapper>(provider => {
+builder.Services.AddTransient<IMapper>(provider =>
+{
     var mc = new MapperConfiguration(mc =>
     {
         mc.AddProfile(new AutoMapperProfile());
@@ -97,5 +139,8 @@ app.UseAntiforgery();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// Add additional endpoints required by the Identity /Account Razor components.
+app.MapAdditionalIdentityEndpoints();
 
 app.Run();

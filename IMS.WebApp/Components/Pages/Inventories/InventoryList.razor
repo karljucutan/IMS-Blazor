@@ -1,5 +1,7 @@
 ﻿@page "/inventories"
 
+@attribute [Authorize]
+
 <h3>Inventory List</h3>
 <i class="fs-6 fst-italic">
     The search and delete operations use <strong>static server-side rendering with the `&lt;EditForm Enhance="true"&gt;`</strong>, which results in <strong>partial page rendering</strong> instead of a <strong>full page refresh.</strong> 
