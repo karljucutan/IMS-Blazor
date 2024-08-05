@@ -8,7 +8,7 @@
         @onkeyup="OnKeyup"/>
 </div>
 
-@if (searchResults is not null && searchResults.Any())
+@if (searchResults is not null && searchResults.Count > 0)
 {
     <div class="search-result">
         <ul>

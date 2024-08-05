@@ -57,18 +57,19 @@ namespace IMS.Plugins.EFCoreSqlServer.Repositories
         {
             using var db = await _dbContextFactory.CreateDbContextAsync();
 
-            await db.InventoryTransactions.AddAsync(
-                new InventoryTransaction
-                {
-                    PurchaseOrderNumber = purchaseNumber,
-                    InventoryId = inventory.InventoryId,
-                    QuantityBefore = inventory.Quantity,
-                    ActivityType = InventoryTransactionType.PurchaseInventory,
-                    QuantityAfter = inventory.Quantity + quantity,
-                    TransactionDate = DateTime.UtcNow,
-                    DoneBy = doneBy,
-                    UnitPrice = price
-                });
+            var inventoryTransaction = new InventoryTransaction
+            {
+                PurchaseOrderNumber = purchaseNumber,
+                InventoryId = inventory.InventoryId,
+                QuantityBefore = inventory.Quantity,
+                ActivityType = InventoryTransactionType.PurchaseInventory,
+                QuantityAfter = inventory.Quantity + quantity,
+                TransactionDate = DateTime.UtcNow,
+                DoneBy = doneBy,
+                UnitPrice = price
+            };
+
+            await db.InventoryTransactions.AddAsync(inventoryTransaction);
 
             await db.SaveChangesAsync();
         }

@@ -6,6 +6,7 @@
 
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject IViewInventoriesByNameUseCase ViewInventoriesByNameUseCase
 @inject IViewInventoryByIdUseCase ViewInventoriesByIdUseCase
@@ -51,6 +52,7 @@
     private PurchaseViewModel purchaseViewModel = new();
     private PurchaseOrderDTO purchaseOrderDTO = new();
     private InventoryViewModel? selectedInventory;
+    private AuthenticationState? authenticationState;
 
     #region sync implementation of SearchInventory
     // private List<ItemViewModel>? SearchInventory(string name)
@@ -67,6 +69,11 @@
     //             }).ToList();
     // }
     #endregion
+
+    protected async override Task OnInitializedAsync()
+    {
+        authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -102,14 +109,23 @@
 
     private async Task PurchaseAsync()
     {
-        purchaseOrderDTO.PurchaseNumber = purchaseViewModel.PurchaseOrderNumber;
-        purchaseOrderDTO.Inventory = Mapper.Map<Inventory>(selectedInventory);
-        purchaseOrderDTO.Quantity = purchaseViewModel.QuantityToPurchase;
-        purchaseOrderDTO.DoneBy = "Karl";
+        try
+        {
+            var applicationUserName = authenticationState.User.Identity.Name;
 
-        // TODO: Create ViewModel (UI), DTO (Application), DB (Infra) 
-        await PuchaseInventoryUseCase.ExecuteAsync(purchaseOrderDTO);
-        purchaseViewModel = new();
-        selectedInventory = null;
+            purchaseOrderDTO.PurchaseNumber = purchaseViewModel.PurchaseOrderNumber;
+            purchaseOrderDTO.Inventory = Mapper.Map<Inventory>(selectedInventory);
+            purchaseOrderDTO.Quantity = purchaseViewModel.QuantityToPurchase;
+            purchaseOrderDTO.DoneBy = applicationUserName;
+
+            // TODO: Create ViewModel (UI), DTO (Application), DB (Infra) 
+            await PuchaseInventoryUseCase.ExecuteAsync(purchaseOrderDTO);
+            purchaseViewModel = new();
+            selectedInventory = null;
+        }
+        catch (Exception e)
+        {
+            var a = e;
+        }
     }
 }

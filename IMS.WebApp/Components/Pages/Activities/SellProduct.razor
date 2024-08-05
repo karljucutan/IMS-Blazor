@@ -5,6 +5,7 @@
 
 @rendermode InteractiveServer
 
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @inject IJSRuntime JSRuntime
 @inject IViewProductByIdUseCase ViewProductByIdUseCase
 @inject IViewProductsByNameUseCase ViewProductsByNameUseCase
@@ -48,6 +49,12 @@
 @code {
     private SellViewModel sellViewModel = new();
     private Product? selectedProduct;
+    private AuthenticationState? authenticationState;
+
+    protected async override Task OnInitializedAsync()
+    {
+        authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+    }
 
     protected override void OnAfterRender(bool firstRender)
     {
@@ -84,6 +91,7 @@
 
     private async Task SellAsync()
     {
+        var applicationUserName = authenticationState.User.Identity.Name;
 
         // TODO: Application layer should use DTO.
         // Presentation (UI) layer should use ViewModel.
@@ -93,7 +101,7 @@
             selectedProduct,
             sellViewModel.QuantityToSell,
             sellViewModel.UnitPrice,
-            "Karl");
+            applicationUserName);
 
         sellViewModel = new();
         selectedProduct = null;
