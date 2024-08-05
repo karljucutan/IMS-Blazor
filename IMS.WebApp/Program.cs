@@ -37,6 +37,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Sales", policy => policy.RequireClaim("Department", "Sales"));
     options.AddPolicy("Purchasers", policy => policy.RequireClaim("Department", "Purchasing"));
     options.AddPolicy("Productions", policy => policy.RequireClaim("Department", "ProducitonManagement"));
+    //TODO: can use smart enums to get the values
 });
 builder.Services.AddAuthentication(options =>
 {
