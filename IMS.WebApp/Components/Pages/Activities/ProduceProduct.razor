@@ -1,7 +1,7 @@
 ﻿@page "/produce"
 @using static IMS.WebApp.Components.Controls.Common.AutoCompleteComponent
 
-@attribute [Authorize]
+@attribute [Authorize(Policy = "Productions")]
 
 @rendermode InteractiveServer
 

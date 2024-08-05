@@ -8,6 +8,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Profile</PageTitle>
 
@@ -33,10 +34,22 @@
     </div>
 </div>
 
+<div>
+    @if (authenticationState is not null)
+    {
+        @foreach (var claim in authenticationState.User.Claims)
+        {
+            <li class="bi bi-person-fill-nav-menu" aria-hidden="true">@claim.Type: @claim.Value</li>
+        }
+    }
+
+</div>
+
 @code {
     private ApplicationUser user = default!;
     private string? username;
     private string? phoneNumber;
+    private AuthenticationState authenticationState;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -51,6 +64,8 @@
         phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
         Input.PhoneNumber ??= phoneNumber;
+
+        authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
     }
 
     private async Task OnValidSubmitAsync()
