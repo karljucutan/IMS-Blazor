@@ -1,4 +1,4 @@
-﻿@page "/Account/ManageUser/{UserId}"
+﻿@page "/account/manageuser/{UserId}"
 @using IMS.Plugins.Accounts.EFCoreSqlserver
 @using Microsoft.AspNetCore.Identity
 @using System.Security.Claims
@@ -29,20 +29,17 @@
         <br />
         <div class="form-group">
             <label for="dp">Department</label>
-            @ViewModel.Department
-            <InputSelect id="dp" class="form-control" @bind-Value="@ViewModel.Department">
+            <InputSelect id="dp" @bind-Value="ViewModel.Department" class="form-control">
                 <option value="">Select Department</option>
-                <option value="Administration">Admin</option>
-                <option value="InventoryManagement">Inventory Management</option>
-                <option value="Sales">Sales</option>
-                <option value="Purchasing">Purchasing</option>
-                <option value="ProductManagement">Product Management</option>
-                @* TODO: can use smart enums to get the values.*@
+                @foreach (var option in departmentOptions)
+                {
+                    <option value="@option.Value">@option.Text</option>
+                }
             </InputSelect>
         </div>
         <br />
         <button type="submit" class="btn btn-primary">Save</button>
-        <a href="Account/ManageUsers" class="btn btn-secondary">Cancel</a>
+        <a href="account/manageUsers" class="btn btn-secondary">Cancel</a>
     </EditForm>
 }
 
@@ -55,9 +52,17 @@
     private ApplicationUser? selectedUser;
     private Claim? departmentClaim;
     private bool userHasDepartment = true;
-
     [SupplyParameterFromForm]
     private ManageUserViewModel? ViewModel { get; set; }
+
+    private List<SelectListItem> departmentOptions = new()
+    {
+        new SelectListItem { Value = "Administration", Text = "Admin" },
+        new SelectListItem { Value = "InventoryManagement", Text = "Inventory Management" },
+        new SelectListItem { Value = "Sales", Text = "Sales" },
+        new SelectListItem { Value = "Purchasing", Text = "Purchasing" },
+        new SelectListItem { Value = "ProductionManagement", Text = "Production Management" }
+    };
 
     protected override async Task OnParametersSetAsync()
     {
@@ -84,9 +89,9 @@
         if (userHasDepartment)
         {
             await UserManager.ReplaceClaimAsync(
-            selectedUser,
-            departmentClaim,
-            new Claim(DepartmentConstant, ViewModel.Department));
+                selectedUser,
+                departmentClaim,
+                new Claim(DepartmentConstant, ViewModel.Department));
         }
         else
         {
@@ -95,7 +100,7 @@
                 new Claim(DepartmentConstant, ViewModel.Department));
         }
 
-        NavigationManager.NavigateTo("Account/ManagerUsers");
+        NavigationManager.NavigateTo("account/manageusers");
     }
 
     public class ManageUserViewModel
@@ -104,5 +109,11 @@
 
         [Required]
         public string Department { get; set; }
+    }
+
+    public class SelectListItem
+    {
+        public string Value { get; set; }
+        public string Text { get; set; }
     }
 }
